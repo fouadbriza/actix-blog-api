@@ -3,10 +3,6 @@ use actix_web::middleware::Logger;
 
 mod utils;
 mod routes;
-#[get("/hello/{name}")]
-async fn greet(name: web::Path<String>) -> impl Responder {
-    format!("Hello {name}!")
-}
 
 #[actix_web::main] // or #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -19,11 +15,15 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init();
 
+    let address = utils::constants::ADDRESS.clone();
+    let port = utils::constants::PORT.clone();
+
 
     HttpServer::new(|| {
-        App::new().wrap(Logger::default()).service(greet)
+        App::new().wrap(Logger::default())
+        .configure(routes::home_routes::config)
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((address, port))?
     .run()
     .await
 }
