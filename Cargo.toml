@@ -17,3 +17,7 @@ lazy_static = "1.5.0"
 sea-orm = { version = "2.0.0-rc", features = [ "sqlx-postgres", "runtime-tokio-rustls", "macros" ] }
 entity = {path = "entity"}
 migration = { path = "migration" }
+sha256 = "1.6.0"
+chrono = "0.4.45"
+jsonwebtoken = { version = "10.4.0", features = ["rust_crypto"] }
+actix-web-lab = "0.26.0"
