@@ -6,8 +6,15 @@ use sea_orm::{Database, DatabaseConnection};
 mod utils;
 mod routes;
 
+#[derive(Debug)]
+struct MainError {
+    message: String
+}
+
+
+
 #[actix_web::main] // or #[tokio::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<(),MainError> {
 
     if std::env::var_os("RUST_LOG").is_none() {
         
@@ -20,8 +27,13 @@ async fn main() -> std::io::Result<()> {
     let address = utils::constants::ADDRESS.clone();
     let port = utils::constants::PORT.clone();
 
-    let db: DatabaseConnection = Database::connect(utils::constants::DATABASE_URL.clone()).await.unwrap();
-    Migrator::up(&db, None).await.unwrap();
+    let db: DatabaseConnection = Database::connect(utils::constants::DATABASE_URL.clone())
+    .await
+    .map_err(|err| MainError {message: err.to_string()})?;
+
+    Migrator::up(&db, None)
+    .await
+    .map_err(|err| MainError {message: err.to_string()})?;
 
     HttpServer::new(move || {
         App::new()
@@ -31,7 +43,9 @@ async fn main() -> std::io::Result<()> {
         .configure(routes::auth_routes::config)
         .configure(routes::user_routes::config)
     })
-    .bind((address, port))?
+    .bind((address, port))
+    .map_err(|err| MainError {message: err.to_string()})?
     .run()
     .await
+    .map_err(|err| MainError {message: err.to_string()})
 }

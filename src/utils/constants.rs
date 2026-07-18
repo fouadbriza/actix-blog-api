@@ -12,12 +12,14 @@ lazy_static!(
 
 fn set_address() -> String {
     dotenv::dotenv().ok();
-    env::var("ADDRESS").unwrap()
+    env::var("ADDRESS").unwrap_or("127.0.0.1".to_string())
 }
 
 fn set_port() -> u16 {
     dotenv::dotenv().ok();
-    env::var("PORT").unwrap().parse::<u16>().unwrap()
+    env::var("PORT").unwrap_or("8080".to_owned())
+    .parse::<u16>()
+    .expect("cannot parse port")
 }
 
 fn set_db_url() -> String{
